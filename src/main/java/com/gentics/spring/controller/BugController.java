@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gentics.spring.model.Bug;
@@ -28,6 +29,12 @@ public class BugController {
 	@RequestMapping(method=RequestMethod.POST)
 	public @ResponseBody Bug create (@RequestBody Bug bug) {
 		return repo.save(bug);
+	}
+	
+	@RequestMapping(value="/findbyname", method=RequestMethod.GET)
+	public @ResponseBody
+	List<Bug> findByName(@RequestParam(value = "name", required = true) String name) {
+		return repo.findByName(name);
 	}
 
 }
