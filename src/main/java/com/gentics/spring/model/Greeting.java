@@ -1,8 +1,12 @@
 package com.gentics.spring.model;
 
-public class Greeting {
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class Greeting implements Serializable {
 
 	private final long id;
+
 	private final String content;
 
 	public Greeting(long id, String content) {
