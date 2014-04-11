@@ -1,11 +1,15 @@
 package com.gentics.spring.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -20,6 +24,9 @@ public class Bug implements Serializable {
 	private String name;
 
 	private String description;
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	private Set<Tag> tags = new HashSet<Tag>();
 
 	public Long getId() {
 		return id;
@@ -27,13 +34,6 @@ public class Bug implements Serializable {
 
 	public Bug() {
 
-	}
-
-	public Bug(Long id, String name, String description) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
 	}
 
 	public void setId(Long id) {
@@ -54,6 +54,14 @@ public class Bug implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
 	}
 
 }
