@@ -12,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @XmlRootElement
 @SuppressWarnings("serial")
@@ -26,6 +29,7 @@ public class Bug implements Serializable {
 	private String description;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
+	@Fetch(FetchMode.JOIN)
 	private Set<Tag> tags = new HashSet<Tag>();
 
 	public Long getId() {

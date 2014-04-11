@@ -67,6 +67,8 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 			HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 			vendorAdapter.setDatabase(Database.HSQL);
 			vendorAdapter.setGenerateDdl(true);
+			// show the sql statements
+			vendorAdapter.setShowSql(true);
 
 			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 			factory.setJpaVendorAdapter(vendorAdapter);

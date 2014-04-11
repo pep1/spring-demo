@@ -3,6 +3,7 @@ package com.gentics.spring.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -14,13 +15,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gentics.spring.model.Bug;
+import com.gentics.spring.model.QBug;
 import com.gentics.spring.model.Tag;
 import com.gentics.spring.repository.BugRepository;
 import com.gentics.spring.repository.TagRepository;
+import com.google.common.collect.Lists;
+import com.mysema.query.types.expr.BooleanExpression;
 
 @Controller
 @RequestMapping(value = "/bug", produces = "application/json")
 public class BugController {
+
+	private static final Logger log = Logger.getLogger(BugController.class);
 
 	@Autowired
 	private BugRepository bugRepo;
@@ -72,7 +78,8 @@ public class BugController {
 
 	@RequestMapping(value = "/findbytags/{tags}", method = RequestMethod.GET)
 	public @ResponseBody
-	List<Bug> findByTags(@PathVariable(value = "tags") String tagString) {
+	List<Bug> findByTags(@PathVariable(value = "tags") String tagString,
+			@RequestParam(value = "disjunct", required = false, defaultValue = "false") Boolean disjunct) {
 
 		String[] tagNames = tagString.split(",");
 		List<Tag> foundTags = new ArrayList<Tag>();
@@ -82,10 +89,29 @@ public class BugController {
 			Tag tag = tagRepo.findByName(string);
 			if (tag != null) {
 				foundTags.add(tag);
+			} else {
+				String message = "specified tag " + string + " does not exist!";
+				
+				log.error(message);
+				throw new IllegalArgumentException(message);
 			}
 		}
 
-		return bugRepo.findByTagsIn(foundTags);
+		if (disjunct) {
+
+			// build query dsl predicate
+			QBug bug = QBug.bug;
+			BooleanExpression expression = bug.isNotNull();
+
+			for (Tag tag : foundTags) {
+				expression = expression.and(bug.tags.contains(tag));
+			}
+
+			return Lists.newArrayList(bugRepo.findAll(expression));
+		} else {
+
+			return bugRepo.findByTagsIn(foundTags);
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
