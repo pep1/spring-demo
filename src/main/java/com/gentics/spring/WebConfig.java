@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -54,6 +55,7 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 	@Configuration
 	@EnableJpaRepositories
 	@EnableTransactionManagement
+	@EnableAspectJAutoProxy(proxyTargetClass=true)
 	public static class RootConfig {
 
 		@Bean
@@ -68,7 +70,7 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 			vendorAdapter.setDatabase(Database.HSQL);
 			vendorAdapter.setGenerateDdl(true);
 			// show the sql statements
-			vendorAdapter.setShowSql(true);
+			vendorAdapter.setShowSql(false);
 
 			LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 			factory.setJpaVendorAdapter(vendorAdapter);

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.gentics.spring.aop.TimeMeasureAspect;
+import com.gentics.spring.aop.TimeMeasurement;
 import com.gentics.spring.model.Bug;
 import com.gentics.spring.model.QBug;
 import com.gentics.spring.model.Tag;
@@ -34,16 +36,19 @@ public class BugController {
 
 	@Autowired
 	private TagRepository tagRepo;
+	
+	@Autowired
+	private TimeMeasureAspect timeAspect;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public @ResponseBody
-	List<Bug> list() {
+	List<Bug> findAll() {
 		return bugRepo.findAll();
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public @ResponseBody
-	Bug get(@PathVariable("id") Long id) {
+	Bug findById(@PathVariable("id") Long id) {
 		return bugRepo.findOne(id);
 	}
 
@@ -52,7 +57,7 @@ public class BugController {
 	Bug tag(@PathVariable("id") Long id, @RequestParam(value = "name", required = true) String name) {
 
 		// get the bug by id
-		Bug bug = get(id);
+		Bug bug = findById(id);
 		Assert.notNull(bug, "Bug could not be found!");
 
 		Tag tag = tagRepo.findByName(name);
@@ -92,7 +97,7 @@ public class BugController {
 				foundTags.add(tag);
 			} else {
 				String message = "specified tag " + string + " does not exist!";
-				
+
 				log.error(message);
 				throw new IllegalArgumentException(message);
 			}
@@ -118,7 +123,13 @@ public class BugController {
 	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody
 	Bug create(@RequestBody Bug bug) {
-		return bugRepo.save(bug);
+		return bugRepo.saveAndFlush(bug);
+	}
+	
+	@RequestMapping(value = "/time", method = RequestMethod.GET)
+	public @ResponseBody
+	TimeMeasurement time() {
+		return timeAspect.getTimeDetails();
 	}
 
 }
