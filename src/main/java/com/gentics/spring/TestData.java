@@ -41,14 +41,17 @@ public class TestData {
 		Bug bug1 = new Bug();
 		bug1.setName("Alles ist kaput!");
 		bug1.setDescription("Massive data loss!");
+		bug1.setContactEmail("angry@customer.com");
 
 		Bug bug2 = new Bug();
 		bug2.setName("Game");
 		bug2.setDescription("Ein Spiel in Content.Node?");
+		bug2.setContactEmail("berni@gentics.com");
 
 		Bug bug3 = new Bug();
 		bug3.setName("test");
 		bug3.setDescription("Das ist ein Testbug");
+		bug3.setContactEmail("tester123@gentics.com");
 		bug3.getTags().add(tag1);
 
 		bugRepo.save(Arrays.asList(new Bug[] { bug1, bug2, bug3 }));

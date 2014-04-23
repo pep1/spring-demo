@@ -107,6 +107,13 @@
 			<version>4.2.5.Final</version>
 		</dependency>
 
+		<!-- Validation, JSR-303 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.1.0.Final</version>
+		</dependency>
+
 		<!-- Querydsl -->
 		<dependency>
 			<groupId>com.mysema.querydsl</groupId>

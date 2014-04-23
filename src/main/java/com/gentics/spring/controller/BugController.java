@@ -3,11 +3,16 @@ package com.gentics.spring.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gentics.spring.aop.TimeMeasureAspect;
 import com.gentics.spring.aop.TimeMeasurement;
 import com.gentics.spring.model.Bug;
+import com.gentics.spring.model.ErrorStatus;
 import com.gentics.spring.model.QBug;
 import com.gentics.spring.model.Tag;
 import com.gentics.spring.repository.BugRepository;
@@ -130,6 +136,25 @@ public class BugController {
 	public @ResponseBody
 	TimeMeasurement time() {
 		return timeAspect.getTimeDetails();
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public @ResponseBody ErrorStatus handleException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
+		
+		String message = null;
+		
+		if(ex instanceof IllegalArgumentException) {
+			message = "Sorry, some provided parameters could not be processed.";
+			response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+		} else if(ex instanceof ConstraintViolationException) {
+			message = "Sorry, some invalid input parameters provided, please check your input";
+			response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+		} else {
+			message = "Ooops, an error occured";
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		
+		return new ErrorStatus(message, ex);
 	}
 
 }
