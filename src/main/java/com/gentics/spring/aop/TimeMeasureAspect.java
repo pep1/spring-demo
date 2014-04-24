@@ -15,14 +15,15 @@ public class TimeMeasureAspect {
 
 	private static Logger log = Logger.getLogger(TimeMeasureAspect.class);
 
-	private StopWatch findWatch = new StopWatch("Find bugs stop watch");
+	private Long findTotalTime = new Long(0);
 
-	private StopWatch createWatch = new StopWatch("Create bugs stop watch");
+	private Long createTotalTime = new Long(0);
 
 	@Around("execution(* com.gentics.spring.controller.BugController.find*(..))")
 	private Object measureFindTime(ProceedingJoinPoint pjp) throws Throwable {
 
 		log.debug("starting time measurement for find bug. Signature name: " + pjp.getSignature().getName());
+		StopWatch findWatch = new StopWatch("Measure time of method " + pjp.getSignature().getName());
 		findWatch.start();
 
 		Object returnValue = null;
@@ -37,6 +38,7 @@ public class TimeMeasureAspect {
 		} finally {
 			findWatch.stop();
 			log.debug("Execution of method " + pjp.getSignature().getName() + " took " + findWatch.getLastTaskTimeMillis());
+			findTotalTime += findWatch.getLastTaskTimeMillis();
 		}
 
 		return returnValue;
@@ -46,6 +48,7 @@ public class TimeMeasureAspect {
 	private Object measureCreateTime(ProceedingJoinPoint pjp) throws Throwable {
 
 		log.debug("starting time measurement for create bug. Signature name: " + pjp.getSignature().getName());
+		StopWatch createWatch = new StopWatch("Measure time of method " + pjp.getSignature().getName());
 		createWatch.start();
 
 		Object returnValue = null;
@@ -60,13 +63,14 @@ public class TimeMeasureAspect {
 		} finally {
 			createWatch.stop();
 			log.debug("Execution of method " + pjp.getSignature().getName() + " took " + createWatch.getLastTaskTimeMillis());
+			createTotalTime += createWatch.getLastTaskTimeMillis();
 		}
 
 		return returnValue;
 	}
 
 	public TimeMeasurement getTimeDetails() {
-		return new TimeMeasurement(findWatch.getTotalTimeMillis(), createWatch.getTotalTimeMillis());
+		return new TimeMeasurement(findTotalTime, createTotalTime);
 	}
 
 }
