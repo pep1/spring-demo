@@ -1,5 +1,7 @@
 package com.gentics.spring.aop;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -15,9 +17,9 @@ public class TimeMeasureAspect {
 
 	private static Logger log = Logger.getLogger(TimeMeasureAspect.class);
 
-	private Long findTotalTime = new Long(0);
+	private AtomicLong findTotalTime = new AtomicLong(0);
 
-	private Long createTotalTime = new Long(0);
+	private AtomicLong createTotalTime = new AtomicLong(0);
 
 	@Around("execution(* com.gentics.spring.controller.BugController.find*(..))")
 	private Object measureFindTime(ProceedingJoinPoint pjp) throws Throwable {
@@ -37,8 +39,8 @@ public class TimeMeasureAspect {
 			throw e;
 		} finally {
 			findWatch.stop();
-			log.debug("Execution of method " + pjp.getSignature().getName() + " took " + findWatch.getLastTaskTimeMillis());
-			findTotalTime += findWatch.getLastTaskTimeMillis();
+			log.debug(findWatch.shortSummary());
+			findTotalTime.addAndGet(findWatch.getLastTaskTimeMillis());
 		}
 
 		return returnValue;
@@ -62,15 +64,15 @@ public class TimeMeasureAspect {
 			throw e;
 		} finally {
 			createWatch.stop();
-			log.debug("Execution of method " + pjp.getSignature().getName() + " took " + createWatch.getLastTaskTimeMillis());
-			createTotalTime += createWatch.getLastTaskTimeMillis();
+			log.debug(createWatch.shortSummary());
+			createTotalTime.addAndGet(createWatch.getLastTaskTimeMillis());
 		}
 
 		return returnValue;
 	}
 
 	public TimeMeasurement getTimeDetails() {
-		return new TimeMeasurement(findTotalTime, createTotalTime);
+		return new TimeMeasurement(findTotalTime.get(), createTotalTime.get());
 	}
 
 }
